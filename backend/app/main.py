@@ -10,7 +10,7 @@ import aiofiles
 import requests
 import uuid
 from app.services import ocr_service, explain_service, analysis_service
-from app.routers import analysis, auth, users, chat, disease_prediction
+from app.routers import analysis, auth, users, chat, disease_prediction, doctor_recommendations, appointments, health_agent
 from app.database import connect_db, disconnect_db, create_tables, get_db
 from app.models import User
 from app.auth import get_current_user
@@ -19,8 +19,8 @@ from app.schemas import InteractionType, AnalysisWithExplanationResponse
 
 app = FastAPI(
     title="AI Health Tracker",
-    description="Backend API for AI-powered health analysis with authentication and disease risk prediction",
-    version="2.1.0"
+    description="Backend API for AI-powered health analysis with authentication, disease risk prediction, intelligent doctor recommendations, and automated appointment booking",
+    version="3.0.0"
 )
 
 # Configure CORS
@@ -38,6 +38,9 @@ app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(analysis.router, prefix="/analysis", tags=["analysis"])
 app.include_router(chat.router)  # Chat router with its own prefix
 app.include_router(disease_prediction.router)  # Disease prediction router
+app.include_router(doctor_recommendations.router)  # Doctor recommendations router
+app.include_router(appointments.router)  # Appointments router
+app.include_router(health_agent.router)  # Intelligent health agent router
 
 # Database lifecycle events
 @app.on_event("startup")

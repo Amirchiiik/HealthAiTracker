@@ -18,6 +18,31 @@ class RiskLevel(str, Enum):
     MODERATE = "moderate"
     HIGH = "high"
 
+class AppointmentType(str, Enum):
+    URGENT = "urgent"
+    ROUTINE = "routine"
+    FOLLOW_UP = "follow_up"
+
+class AppointmentStatus(str, Enum):
+    SCHEDULED = "scheduled"
+    CONFIRMED = "confirmed"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+class PriorityLevel(str, Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+class BookingMethod(str, Enum):
+    MANUAL = "manual"
+    AUTO_AGENT = "auto_agent"
+
+class AgentAction(str, Enum):
+    NONE = "none"
+    BOOKING_ATTEMPTED = "booking_attempted"
+    APPOINTMENT_BOOKED = "appointment_booked"
+
 # User schemas
 class UserBase(BaseModel):
     full_name: str
@@ -243,4 +268,123 @@ class EnhancedAnalysisResponse(BaseModel):
     analysis: Dict[str, Any]
     disease_predictions: Optional[DiseasePredictionResponse] = None
     saved_to_history: bool = True
-    analysis_id: int 
+    analysis_id: int
+
+# Appointment schemas
+class DoctorAvailabilityBase(BaseModel):
+    day_of_week: int = Field(..., ge=0, le=6, description="Day of week (0=Monday, 6=Sunday)")
+    start_time: str = Field(..., description="Start time in HH:MM format")
+    end_time: str = Field(..., description="End time in HH:MM format")
+    is_active: bool = Field(default=True)
+
+class DoctorAvailabilityCreate(DoctorAvailabilityBase):
+    pass
+
+class DoctorAvailabilityResponse(DoctorAvailabilityBase):
+    id: int
+    doctor_id: int
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+class AppointmentBase(BaseModel):
+    appointment_datetime: datetime = Field(..., description="Appointment date and time")
+    duration_minutes: int = Field(default=60, ge=15, le=240, description="Appointment duration in minutes")
+    appointment_type: AppointmentType = Field(..., description="Type of appointment")
+    reason: Optional[str] = Field(None, description="Reason for appointment")
+    specialist_type: Optional[str] = Field(None, description="Required specialist type")
+    priority_level: PriorityLevel = Field(..., description="Priority level")
+    notes: Optional[str] = Field(None, description="Additional notes")
+
+class AppointmentCreate(AppointmentBase):
+    doctor_id: int = Field(..., description="ID of the doctor")
+    health_analysis_id: Optional[int] = Field(None, description="Related health analysis ID")
+
+class AppointmentUpdate(BaseModel):
+    status: Optional[AppointmentStatus] = None
+    notes: Optional[str] = None
+    appointment_datetime: Optional[datetime] = None
+
+class AppointmentResponse(AppointmentBase):
+    id: int
+    patient_id: int
+    doctor_id: int
+    health_analysis_id: Optional[int]
+    status: AppointmentStatus
+    booking_method: BookingMethod
+    created_at: datetime
+    updated_at: datetime
+    patient: UserResponse
+    doctor: UserResponse
+    
+    class Config:
+        from_attributes = True
+
+class DoctorProfileResponse(UserResponse):
+    medical_specialty: Optional[str]
+    is_available_for_booking: bool
+    availability: Optional[List[DoctorAvailabilityResponse]] = []
+
+class AvailableDoctorsResponse(BaseModel):
+    doctors: List[DoctorProfileResponse]
+    specialty: Optional[str]
+    total_count: int
+
+# Intelligent Agent schemas
+class AgentRecommendationBase(BaseModel):
+    recommended_specialists: List[Dict[str, Any]] = Field(..., description="List of recommended specialists")
+    critical_metrics: List[Dict[str, Any]] = Field(..., description="Metrics that triggered recommendations")
+    priority_level: PriorityLevel = Field(..., description="Overall priority level")
+    agent_reasoning: Optional[str] = Field(None, description="Why the agent made these recommendations")
+    next_steps: Optional[List[str]] = Field(None, description="Recommended next steps")
+
+class AgentRecommendationCreate(AgentRecommendationBase):
+    action_taken: AgentAction = Field(..., description="Action taken by the agent")
+    appointment_id: Optional[int] = Field(None, description="ID of booked appointment if any")
+
+class AgentRecommendationResponse(AgentRecommendationBase):
+    id: int
+    patient_id: int
+    health_analysis_id: int
+    action_taken: AgentAction
+    appointment_id: Optional[int]
+    processed_at: datetime
+    patient: UserResponse
+    appointment: Optional[AppointmentResponse] = None
+    
+    class Config:
+        from_attributes = True
+
+class IntelligentAgentRequest(BaseModel):
+    health_analysis_id: int = Field(..., description="ID of the health analysis to process")
+    auto_book_critical: bool = Field(default=True, description="Whether to automatically book appointments for critical cases")
+    preferred_datetime: Optional[datetime] = Field(None, description="Preferred appointment time")
+    language: Optional[str] = Field(default="ru", description="Response language (ru/en)")
+    
+    @validator('language')
+    def validate_language(cls, v):
+        if v and v not in ['ru', 'en']:
+            raise ValueError('Language must be either "ru" or "en"')
+        return v or "ru"
+
+class IntelligentAgentResponse(BaseModel):
+    analysis_summary: Dict[str, Any] = Field(..., description="Summary of the health analysis")
+    recommendations: AgentRecommendationResponse = Field(..., description="Agent recommendations")
+    actions_taken: List[str] = Field(..., description="List of actions taken by the agent")
+    notifications_sent: List[str] = Field(..., description="List of notifications sent")
+    appointment_booked: Optional[AppointmentResponse] = Field(None, description="Appointment details if booked")
+    
+class AutoBookingRequest(BaseModel):
+    specialist_type: str = Field(..., description="Type of specialist needed")
+    priority_level: PriorityLevel = Field(..., description="Priority level for booking")
+    reason: str = Field(..., description="Reason for appointment")
+    health_analysis_id: int = Field(..., description="Related health analysis ID")
+    preferred_datetime: Optional[datetime] = Field(None, description="Preferred appointment time")
+
+class AutoBookingResponse(BaseModel):
+    success: bool = Field(..., description="Whether booking was successful")
+    appointment: Optional[AppointmentResponse] = Field(None, description="Appointment details if booked")
+    available_doctors: List[DoctorProfileResponse] = Field(default=[], description="Available doctors if booking failed")
+    message: str = Field(..., description="Status message")
+    next_available_slot: Optional[datetime] = Field(None, description="Next available appointment slot") 

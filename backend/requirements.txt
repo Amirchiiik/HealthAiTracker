@@ -1,49 +1,113 @@
-# AI Health Tracker - Essential Dependencies
+# AI Health Tracker - Complete Dependencies List
 
-# Web Framework
+# ===============================
+# Web Framework & ASGI Server
+# ===============================
 fastapi==0.110.0
 uvicorn[standard]==0.31.1
 
+# ===============================
 # Database & ORM
+# ===============================
 sqlalchemy==2.0.36
 alembic==1.14.0
 
+# ===============================
 # Authentication & Security
+# ===============================
 passlib[bcrypt]==1.7.4
 python-jose[cryptography]==3.3.0
 python-multipart==0.0.20
+pyjwt==2.10.1
+bcrypt==4.1.2
 
-# HTTP Client for API calls
+# ===============================
+# HTTP Client Libraries
+# ===============================
 requests==2.32.3
 httpx==0.28.1
 
+# ===============================
 # OCR and Image Processing
+# ===============================
 easyocr==1.7.1
 Pillow==10.4.0
 opencv-python==4.10.0.84
 PyMuPDF==1.24.1
 
-# NLP & Text Processing
-sentence-transformers==3.3.1
+# ===============================
+# NLP & AI Processing
+# ===============================
+groq==0.8.0
 
-# Data Processing
+# ===============================
+# Data Processing & Analysis
+# ===============================
 pandas==2.2.3
 numpy<2.0,>=1.26.0
+scikit-learn==1.5.1
 
+# ===============================
 # Environment & Configuration
+# ===============================
 python-dotenv==1.0.1
 pydantic==2.10.3
 pydantic-settings==2.7.0
 
-# File handling
+# ===============================
+# File Handling & I/O
+# ===============================
 aiofiles==24.1.0
 
+# ===============================
+# Date/Time & Localization
+# ===============================
+pytz==2023.3
+python-dateutil==2.8.2
+
+# ===============================
+# Email & Validation
+# ===============================
+email-validator==2.2.0
+
+# ===============================
 # Development & Testing
+# ===============================
 pytest==8.3.4
 pytest-asyncio==0.24.0
+pytest-cov==4.0.0
 
-# JSON Web Tokens
-pyjwt==2.10.1
+# ===============================
+# Production Server (Optional)
+# ===============================
+gunicorn==21.2.0
 
-# Email validation
-email-validator==2.2.0 
+# ===============================
+# Logging & Monitoring
+# ===============================
+loguru==0.7.2
+
+# ===============================
+# JSON & Data Validation
+# ===============================
+jsonschema==4.21.1
+
+# ===============================
+# Additional Utilities
+# ===============================
+typing-extensions==4.9.0
+asyncio==3.4.3
+
+# ===============================
+# Medical & Healthcare Specific
+# ===============================
+# Add any medical-specific libraries here
+# medical-data-parser==1.0.0  # Example if needed
+
+# ===============================
+# Version Compatibility Notes
+# ===============================
+# Python 3.8+ required
+# Compatible with FastAPI 0.110.0+
+# SQLAlchemy 2.0+ for modern async support
+# NumPy < 2.0 for compatibility with other packages 

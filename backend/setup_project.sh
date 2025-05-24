@@ -1,7 +1,11 @@
 #!/bin/bash
 
-# AI Health Tracker - Complete Setup Script
-# This script sets up the project without requiring GROQ_API_KEY
+# =============================================================================
+# AI Health Tracker Backend - Automated Setup Script
+# =============================================================================
+# This script automates the initial setup of the FastAPI-based backend project
+# Usage: ./setup_project.sh [--skip-venv] [--skip-tests]
+# =============================================================================
 
 set -e  # Exit on any error
 
@@ -11,239 +15,425 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Progress indicator
-show_progress() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+# Configuration
+PROJECT_NAME="AI Health Tracker Backend"
+PYTHON_VERSION="3.8"
+VENV_NAME="venv"
+ENV_FILE=".env"
+ENV_EXAMPLE=".env.example"
+
+# Parse command line arguments
+SKIP_VENV=false
+SKIP_TESTS=false
+FORCE_REINSTALL=false
+
+for arg in "$@"; do
+    case $arg in
+        --skip-venv)
+            SKIP_VENV=true
+            shift
+            ;;
+        --skip-tests)
+            SKIP_TESTS=true
+            shift
+            ;;
+        --force-reinstall)
+            FORCE_REINSTALL=true
+            shift
+            ;;
+        --help|-h)
+            echo "Usage: $0 [options]"
+            echo "Options:"
+            echo "  --skip-venv       Skip virtual environment setup"
+            echo "  --skip-tests      Skip dependency testing"
+            echo "  --force-reinstall Force reinstall all dependencies"
+            echo "  --help, -h        Show this help message"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $arg"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+    esac
+done
+
+# Helper functions
+log_info() {
+    echo -e "${BLUE}ℹ️  $1${NC}"
 }
 
-show_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
+log_success() {
+    echo -e "${GREEN}✅ $1${NC}"
 }
 
-show_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
+log_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
 }
 
-show_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+log_error() {
+    echo -e "${RED}❌ $1${NC}"
 }
 
-show_title() {
-    echo -e "${PURPLE}=== $1 ===${NC}"
+log_step() {
+    echo -e "\n${PURPLE}🚀 $1${NC}"
 }
 
-# Function to check if command exists
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
+check_command() {
+    if command -v $1 &> /dev/null; then
+        log_success "$1 is available"
+        return 0
+    else
+        log_error "$1 is not installed"
+        return 1
+    fi
 }
 
-# Function to check if port is available
-is_port_available() {
-    ! lsof -Pi :$1 -sTCP:LISTEN -t >/dev/null 2>&1
+check_python_version() {
+    if command -v python3 &> /dev/null; then
+        PYTHON_CMD="python3"
+    elif command -v python &> /dev/null; then
+        PYTHON_CMD="python"
+    else
+        log_error "Python is not installed"
+        return 1
+    fi
+
+    PYTHON_VER=$($PYTHON_CMD --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f1-2)
+    log_info "Found Python $PYTHON_VER"
+    
+    # Check if version is >= 3.8
+    if [[ "$(printf '%s\n' "$PYTHON_VERSION" "$PYTHON_VER" | sort -V | head -n1)" = "$PYTHON_VERSION" ]]; then
+        log_success "Python version $PYTHON_VER is compatible (>= $PYTHON_VERSION)"
+        return 0
+    else
+        log_error "Python version $PYTHON_VER is not compatible. Need >= $PYTHON_VERSION"
+        return 1
+    fi
 }
 
-# Function to find available port
-find_available_port() {
-    for port in 8000 8001 8002 8003 8004; do
-        if is_port_available $port; then
-            echo $port
-            return
+setup_virtual_environment() {
+    log_step "Setting up virtual environment"
+    
+    if [[ "$SKIP_VENV" == true ]]; then
+        log_warning "Skipping virtual environment setup"
+        return 0
+    fi
+
+    # Check if virtual environment already exists
+    if [[ -d "$VENV_NAME" ]]; then
+        if [[ "$FORCE_REINSTALL" == true ]]; then
+            log_warning "Removing existing virtual environment"
+            rm -rf "$VENV_NAME"
+        else
+            log_info "Virtual environment already exists"
+            return 0
         fi
-    done
-    echo "8005"  # Default fallback
+    fi
+
+    # Create virtual environment
+    log_info "Creating virtual environment with $PYTHON_CMD"
+    $PYTHON_CMD -m venv $VENV_NAME
+
+    # Verify virtual environment was created
+    if [[ -d "$VENV_NAME" ]]; then
+        log_success "Virtual environment created successfully"
+    else
+        log_error "Failed to create virtual environment"
+        return 1
+    fi
 }
 
-echo -e "${CYAN}"
-echo "╔══════════════════════════════════════════════════════════════════╗"
-echo "║                    AI Health Tracker Setup                      ║"
-echo "║                                                                  ║"
-echo "║  This script will set up your AI Health Tracker backend         ║"
-echo "║  without requiring a Groq API key (optional for full features)  ║"
-echo "╚══════════════════════════════════════════════════════════════════╝"
-echo -e "${NC}"
+activate_virtual_environment() {
+    log_step "Activating virtual environment"
+    
+    if [[ ! -d "$VENV_NAME" ]]; then
+        log_error "Virtual environment not found. Run without --skip-venv first."
+        return 1
+    fi
 
-# Step 1: Environment Validation
-show_title "Step 1: Environment Validation"
+    # Activate virtual environment
+    source "$VENV_NAME/bin/activate"
+    log_success "Virtual environment activated"
+    
+    # Verify we're in the virtual environment
+    if [[ "$VIRTUAL_ENV" ]]; then
+        log_info "Using Python: $(which python)"
+        log_info "Python version: $(python --version)"
+    else
+        log_error "Failed to activate virtual environment"
+        return 1
+    fi
+}
+
+install_dependencies() {
+    log_step "Installing Python dependencies"
+    
+    if [[ ! -f "requirements.txt" ]]; then
+        log_error "requirements.txt not found"
+        return 1
+    fi
+
+    # Upgrade pip first
+    log_info "Upgrading pip"
+    python -m pip install --upgrade pip
+
+    # Install dependencies
+    log_info "Installing dependencies from requirements.txt"
+    if [[ "$FORCE_REINSTALL" == true ]]; then
+        pip install --force-reinstall -r requirements.txt
+    else
+        pip install -r requirements.txt
+    fi
+
+    log_success "Dependencies installed successfully"
+}
+
+setup_environment_file() {
+    log_step "Setting up environment configuration"
+    
+    if [[ -f "$ENV_FILE" ]]; then
+        log_warning ".env file already exists"
+        read -p "Do you want to overwrite it? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_info "Keeping existing .env file"
+            return 0
+        fi
+    fi
+
+    # Create .env file with template
+    cat > "$ENV_FILE" << 'EOF'
+# AI Health Tracker Backend Environment Configuration
+# Update these values with your actual configuration
+
+# ===============================
+# Database Configuration
+# ===============================
+DATABASE_URL=sqlite:///./health_tracker.db
+
+# ===============================
+# JWT Authentication
+# ===============================
+SECRET_KEY=your-secret-key-here-change-in-production-make-it-long-and-random-$(date +%s)
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# ===============================
+# AI Services API Keys
+# ===============================
+# Get your Groq API key from: https://console.groq.com/
+GROQ_API_KEY=gsk_your_groq_api_key_here
+
+# OpenRouter API (Optional, for enhanced AI analysis)
+# Get your OpenRouter API key from: https://openrouter.ai/
+OPENROUTER_API_KEY=sk-or-your_openrouter_api_key_here
+
+# ===============================
+# Email Configuration (Optional)
+# ===============================
+# Gmail Example
+SMTP_USERNAME=your-email@gmail.com
+SMTP_PASSWORD=your-app-password-here
+FROM_EMAIL=your-email@gmail.com
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+
+# ===============================
+# File Upload Configuration
+# ===============================
+MAX_FILE_SIZE=10485760
+UPLOAD_DIR=uploads
+
+# ===============================
+# CORS Configuration
+# ===============================
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080,http://127.0.0.1:3000
+
+# ===============================
+# Development Settings
+# ===============================
+ENVIRONMENT=development
+DEFAULT_LANGUAGE=ru
+HOST=0.0.0.0
+PORT=8001
+EOF
+
+    log_success ".env file created"
+    log_warning "IMPORTANT: Update .env file with your actual API keys and configuration"
+}
+
+create_uploads_directory() {
+    log_step "Creating uploads directory"
+    
+    if [[ ! -d "uploads" ]]; then
+        mkdir -p uploads
+        log_success "uploads directory created"
+    else
+        log_info "uploads directory already exists"
+    fi
+
+    # Create user-specific subdirectories
+    mkdir -p uploads/users
+    chmod 755 uploads
+    log_success "Upload directories configured"
+}
+
+initialize_database() {
+    log_step "Initializing database"
+    
+    # Check if database initialization is needed
+    log_info "Database will be automatically created on first run"
+    log_success "Database initialization prepared"
+}
+
+test_dependencies() {
+    log_step "Testing dependencies"
+    
+    if [[ "$SKIP_TESTS" == true ]]; then
+        log_warning "Skipping dependency tests"
+        return 0
+    fi
+
+    # Create a simple test script
+    cat > test_deps_temp.py << 'EOF'
+import sys
+import importlib
+
+dependencies = [
+    'fastapi', 'uvicorn', 'sqlalchemy', 'alembic', 'passlib', 'jose', 'jwt', 
+    'bcrypt', 'requests', 'httpx', 'easyocr', 'PIL', 'cv2', 'fitz', 'groq',
+    'pandas', 'numpy', 'sklearn', 'dotenv', 'pydantic', 'aiofiles', 'pytz',
+    'dateutil', 'email_validator', 'pytest', 'gunicorn', 'loguru', 'jsonschema'
+]
+
+failed = []
+for dep in dependencies:
+    try:
+        importlib.import_module(dep)
+        print(f"✅ {dep}")
+    except ImportError as e:
+        print(f"❌ {dep} - {e}")
+        failed.append(dep)
+
+if failed:
+    print(f"\n❌ {len(failed)} dependencies failed to import")
+    sys.exit(1)
+else:
+    print(f"\n✅ All {len(dependencies)} dependencies imported successfully!")
+    sys.exit(0)
+EOF
+
+    # Run the test
+    if python test_deps_temp.py; then
+        log_success "All dependencies are working correctly"
+    else
+        log_error "Some dependencies failed to import"
+        rm -f test_deps_temp.py
+        return 1
+    fi
+
+    # Clean up
+    rm -f test_deps_temp.py
+}
+
+test_application() {
+    log_step "Testing application startup"
+    
+    if [[ "$SKIP_TESTS" == true ]]; then
+        log_warning "Skipping application tests"
+        return 0
+    fi
+
+    # Test if the FastAPI app can be imported
+    python -c "
+from app.main import app
+import uvicorn
+print('✅ FastAPI application imports successfully')
+print('✅ Application is ready to start')
+" 2>/dev/null
+
+    if [[ $? -eq 0 ]]; then
+        log_success "Application startup test passed"
+    else
+        log_error "Application startup test failed"
+        return 1
+    fi
+}
+
+display_next_steps() {
+    log_step "Setup Complete! 🎉"
+    
+    echo -e "\n${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}🎯 ${PROJECT_NAME} Setup Complete!${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    echo -e "\n${YELLOW}📋 Next Steps:${NC}"
+    echo -e "${BLUE}1.${NC} ${YELLOW}Activate virtual environment:${NC}"
+    echo -e "   source venv/bin/activate"
+    
+    echo -e "\n${BLUE}2.${NC} ${YELLOW}Update .env file with your API keys:${NC}"
+    echo -e "   nano .env  # or use your preferred editor"
+    echo -e "   ${RED}Required: GROQ_API_KEY${NC}"
+    echo -e "   ${BLUE}Optional: OPENROUTER_API_KEY, SMTP credentials${NC}"
+    
+    echo -e "\n${BLUE}3.${NC} ${YELLOW}Start the development server:${NC}"
+    echo -e "   uvicorn app.main:app --reload --host 0.0.0.0 --port 8001"
+    echo -e "   ${BLUE}Or:${NC} python -m app.main"
+    
+    echo -e "\n${BLUE}4.${NC} ${YELLOW}Access the API documentation:${NC}"
+    echo -e "   Swagger UI: ${BLUE}http://localhost:8001/docs${NC}"
+    echo -e "   ReDoc:      ${BLUE}http://localhost:8001/redoc${NC}"
+    
+    echo -e "\n${BLUE}5.${NC} ${YELLOW}For production deployment:${NC}"
+    echo -e "   gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8001"
+    
+    echo -e "\n${GREEN}📚 Documentation:${NC}"
+    echo -e "   • Setup Guide: ${BLUE}README.md${NC}"
+    echo -e "   • API Docs: ${BLUE}API_ENDPOINTS_DOCUMENTATION.md${NC}"
+    echo -e "   • This Setup: ${BLUE}SETUP_VERIFICATION.md${NC}"
+    
+    echo -e "\n${GREEN}🌍 Language Support:${NC}"
+    echo -e "   • Russian (ru) and English (en) localization available"
+    echo -e "   • Add ${BLUE}\"language\": \"ru\"${NC} to intelligent agent requests"
+    
+    echo -e "\n${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+}
+
+# Main execution
+main() {
+    echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${PURPLE}🚀 ${PROJECT_NAME} - Automated Setup${NC}"
+    echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+
+    # Check prerequisites
+    log_step "Checking prerequisites"
+    check_command "python3" || check_command "python" || exit 1
+    check_python_version || exit 1
+    check_command "pip" || check_command "pip3" || exit 1
+
+    # Setup steps
+    setup_virtual_environment || exit 1
+    activate_virtual_environment || exit 1
+    install_dependencies || exit 1
+    setup_environment_file || exit 1
+    create_uploads_directory || exit 1
+    initialize_database || exit 1
+    test_dependencies || exit 1
+    test_application || exit 1
+    
+    # Success!
+    display_next_steps
+}
 
 # Check if we're in the right directory
-if [[ ! -f "app/main.py" ]]; then
-    show_error "Not in the correct directory. Please run this script from ai-health-backend/"
-    exit 1
-fi
-show_success "✓ Correct directory confirmed"
-
-# Check Python version
-if ! command_exists python3; then
-    show_error "Python 3 is not installed. Please install Python 3.8+ first."
+if [[ ! -f "requirements.txt" ]] || [[ ! -d "app" ]]; then
+    log_error "This script must be run from the backend project directory"
+    log_info "Make sure you're in the directory containing requirements.txt and app/ folder"
     exit 1
 fi
 
-PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
-show_success "✓ Python $PYTHON_VERSION detected"
-
-# Check pip
-if ! command_exists pip3; then
-    show_error "pip3 is not installed. Please install pip first."
-    exit 1
-fi
-show_success "✓ pip3 available"
-
-# Step 2: Virtual Environment Setup
-show_title "Step 2: Virtual Environment Setup"
-
-if [[ ! -d "venv" ]]; then
-    show_progress "Creating virtual environment..."
-    python3 -m venv venv
-    show_success "✓ Virtual environment created"
-else
-    show_success "✓ Virtual environment already exists"
-fi
-
-# Activate virtual environment
-show_progress "Activating virtual environment..."
-source venv/bin/activate
-show_success "✓ Virtual environment activated"
-
-# Step 3: Dependency Installation
-show_title "Step 3: Installing Dependencies"
-
-# Upgrade pip first
-show_progress "Upgrading pip..."
-pip install --upgrade pip --quiet
-
-# Install NumPy with compatibility fix first
-show_progress "Installing NumPy with compatibility fix..."
-pip install "numpy<2.0,>=1.26.0" --quiet
-show_success "✓ NumPy installed with compatibility fix"
-
-# Install other requirements
-show_progress "Installing remaining dependencies..."
-if [[ -f "requirements.txt" ]]; then
-    pip install -r requirements.txt --quiet
-    show_success "✓ All dependencies installed successfully"
-else
-    show_error "requirements.txt not found"
-    exit 1
-fi
-
-# Step 4: Database Initialization
-show_title "Step 4: Database Setup"
-
-show_progress "Initializing database..."
-python -c "
-import sys
-sys.path.append('.')
-from app.database import create_tables
-create_tables()
-print('Database initialized successfully')
-" 2>/dev/null || show_warning "Database may already be initialized"
-
-show_success "✓ Database ready"
-
-# Create necessary directories
-show_progress "Creating upload directories..."
-mkdir -p uploads
-mkdir -p uploads/user_1
-mkdir -p uploads/user_2
-mkdir -p uploads/user_3
-show_success "✓ Upload directories created"
-
-# Step 5: Environment Variables Setup (Optional)
-show_title "Step 5: Environment Variables (Optional)"
-
-if [[ ! -f ".env" ]]; then
-    if [[ -f "env.template" ]]; then
-        show_progress "Creating .env file from template..."
-        cp env.template .env
-        show_success "✓ .env file created from template"
-        
-        echo ""
-        echo -e "${YELLOW}📋 Optional: Set up Groq API for AI explanations${NC}"
-        echo "   1. Visit: https://console.groq.com/"
-        echo "   2. Get your API key (starts with 'gsk_')"
-        echo "   3. Edit .env file and add: GROQ_API_KEY=your_key_here"
-        echo "   4. Or run: echo 'GROQ_API_KEY=your_key_here' >> .env"
-        echo ""
-        echo -e "${CYAN}✨ The system works without API key, but AI explanations need it${NC}"
-    else
-        show_warning "env.template not found, creating basic .env"
-        echo "# AI Health Tracker Environment Variables" > .env
-        echo "# Add your Groq API key here for AI explanations:" >> .env
-        echo "# GROQ_API_KEY=your_actual_key_here" >> .env
-    fi
-else
-    show_success "✓ .env file already exists"
-fi
-
-# Check if Groq API key is set
-if grep -q "^GROQ_API_KEY=" .env 2>/dev/null && ! grep -q "your_actual" .env; then
-    show_success "✓ Groq API key configured - AI explanations available"
-else
-    show_warning "⚠ Groq API key not configured - basic functionality only"
-fi
-
-# Step 6: Port Management
-show_title "Step 6: Server Configuration"
-
-AVAILABLE_PORT=$(find_available_port)
-show_progress "Finding available port..."
-show_success "✓ Will use port $AVAILABLE_PORT"
-
-# Step 7: Final Validation
-show_title "Step 7: Final Validation"
-
-show_progress "Running final checks..."
-
-# Test imports
-python -c "
-import sys
-sys.path.append('.')
-try:
-    from app.main import app
-    print('✓ All imports successful')
-except Exception as e:
-    print(f'✗ Import error: {e}')
-    sys.exit(1)
-" || exit 1
-
-show_success "✓ All systems ready"
-
-# Step 8: Server Startup
-show_title "Step 8: Starting Server"
-
-echo ""
-echo -e "${GREEN}🚀 Starting AI Health Tracker Server...${NC}"
-echo ""
-echo -e "${CYAN}📊 Access Points:${NC}"
-echo "   • API Documentation: http://127.0.0.1:$AVAILABLE_PORT/docs"
-echo "   • Alternative Docs:   http://127.0.0.1:$AVAILABLE_PORT/redoc" 
-echo "   • Health Check:       http://127.0.0.1:$AVAILABLE_PORT/health"
-echo ""
-echo -e "${YELLOW}🔧 Quick Test Commands:${NC}"
-echo "   curl http://127.0.0.1:$AVAILABLE_PORT/health"
-echo ""
-echo -e "${PURPLE}💡 Features Available:${NC}"
-echo "   ✅ User Registration & Authentication"
-echo "   ✅ OCR Processing (easyocr)"
-echo "   ✅ Health Data Management"
-echo "   ✅ Database Storage"
-if grep -q "^GROQ_API_KEY=" .env 2>/dev/null && ! grep -q "your_actual" .env; then
-    echo "   ✅ AI Health Explanations (Groq API)"
-else
-    echo "   ⏳ AI Health Explanations (configure Groq API key)"
-fi
-echo ""
-echo -e "${CYAN}🛑 To stop the server: Press Ctrl+C${NC}"
-echo ""
-
-# Start the server
-show_progress "Launching server on port $AVAILABLE_PORT..."
-echo ""
-
-# Add cursor-logs entry
-echo "$(date): Setup script executed successfully. Server starting on port $AVAILABLE_PORT. All dependencies installed, database initialized, upload directories created." >> cursor-logs.md
-
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port $AVAILABLE_PORT 
+# Run main function
+main "$@" 
