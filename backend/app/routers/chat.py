@@ -13,6 +13,7 @@ from app.schemas import (
     ChatParticipant
 )
 from app.services.chat_service import ChatService
+from app.websocket import manager
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
@@ -52,6 +53,29 @@ async def send_message(
     # Send message
     try:
         message = chat_service.send_message(current_user.id, message_data, file_info)
+        
+        # Send real-time notification via WebSocket
+        await manager.notify_new_message(
+            sender_id=current_user.id,
+            receiver_id=receiver_id,
+            message_data={
+                "id": message.id,
+                "sender_id": message.sender_id,
+                "receiver_id": message.receiver_id,
+                "message_text": message.message_text,
+                "attachment_filename": message.attachment_filename,
+                "attachment_size": message.attachment_size,
+                "attachment_type": message.attachment_type,
+                "is_read": message.is_read,
+                "created_at": message.created_at.isoformat(),
+                "sender": {
+                    "id": message.sender.id,
+                    "full_name": message.sender.full_name,
+                    "role": message.sender.role
+                }
+            }
+        )
+        
         return message
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to send message: {str(e)}")
@@ -166,7 +190,7 @@ def delete_message(
         raise HTTPException(status_code=500, detail=f"Delete failed: {str(e)}")
 
 @router.put("/mark-read/{other_user_id}")
-def mark_conversation_read(
+async def mark_conversation_read(
     other_user_id: int,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -183,7 +207,15 @@ def mark_conversation_read(
         chat_service.validate_users_can_chat(current_user.id, other_user_id)
         
         # Mark messages as read
-        chat_service.mark_messages_as_read(current_user.id, other_user_id)
+        marked_messages = chat_service.mark_messages_as_read(current_user.id, other_user_id)
+        
+        # Send WebSocket notification for each marked message
+        for message_id in marked_messages:
+            await manager.notify_message_read(
+                reader_id=current_user.id,
+                sender_id=other_user_id,
+                message_id=message_id
+            )
         
         return {"message": "Messages marked as read"}
     except Exception as e:

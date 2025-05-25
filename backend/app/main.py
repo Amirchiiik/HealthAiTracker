@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Depends
+from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Depends, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -9,13 +9,15 @@ from typing import Dict, Any, Optional
 import aiofiles
 import requests
 import uuid
+import jwt
 from app.services import ocr_service, explain_service, analysis_service
 from app.routers import analysis, auth, users, chat, disease_prediction, doctor_recommendations, appointments, health_agent
 from app.database import connect_db, disconnect_db, create_tables, get_db
 from app.models import User
-from app.auth import get_current_user
+from app.auth import get_current_user, SECRET_KEY, ALGORITHM
 from app.services.database_service import save_analysis_to_history, save_chat_to_history
 from app.schemas import InteractionType, AnalysisWithExplanationResponse
+from app.websocket import manager
 
 app = FastAPI(
     title="AI Health Tracker",
@@ -332,3 +334,38 @@ async def explain_metrics_individually(
             pass
         
         raise HTTPException(status_code=500, detail=error_msg)
+
+# WebSocket endpoint for real-time chat
+@app.websocket("/ws/{token}")
+async def websocket_endpoint(websocket: WebSocket, token: str):
+    """WebSocket endpoint for real-time chat communication"""
+    try:
+        # Decode the JWT token to get user info
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: int = int(payload.get("sub"))
+        user_role: str = payload.get("role")
+        
+        if user_id is None or user_role is None:
+            await websocket.close(code=4001, reason="Invalid token")
+            return
+            
+    except jwt.PyJWTError:
+        await websocket.close(code=4001, reason="Invalid token")
+        return
+    
+    # Connect the user
+    await manager.connect(websocket, user_id, user_role)
+    
+    try:
+        while True:
+            # Wait for messages from the client
+            data = await websocket.receive_text()
+            
+            # For now, we'll just echo back a confirmation
+            # In a full implementation, you might handle different message types here
+            await websocket.send_text(f"Message received: {data}")
+            
+    except WebSocketDisconnect:
+        # Handle disconnection
+        manager.disconnect(user_id)
+        await manager.broadcast_user_status(user_id, "offline")
