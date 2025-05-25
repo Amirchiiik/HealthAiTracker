@@ -112,3 +112,4 @@ typing-extensions>=4.12.2
 # Compatible with FastAPI 0.110.0+
 # SQLAlchemy 2.0+ for modern async support
 # NumPy < 2.0 for compatibility with other packages 
+

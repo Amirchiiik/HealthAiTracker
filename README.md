@@ -1,345 +1,306 @@
-# AI Health Tracker Mobile App 📱
+# 🏥 AI Health Tracker - Backend API
 
-A comprehensive React Native mobile application for the AI Health Tracker system, providing patients with medical document upload, AI-powered analysis, doctor consultations, and health monitoring capabilities.
+## 📋 **Overview**
 
-![React Native](https://img.shields.io/badge/React%20Native-0.73.0-blue)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.1.6-blue)
-![Languages](https://img.shields.io/badge/Languages-🇷🇺%20🇺🇸%20🇰🇿-green)
+This is the backend API for the AI Health Tracker application, providing comprehensive healthcare data processing, AI-powered analysis, and intelligent agent capabilities.
 
-## 🎯 Features
+## 🚀 **Features**
 
-### 📤 Document Upload & OCR
-- **Camera Capture**: Take photos of medical documents
-- **Gallery Selection**: Choose existing photos from device
-- **PDF Support**: Upload PDF medical reports
-- **OCR Processing**: Automatic text extraction with explanations
-- **Multi-language Support**: Process documents in Russian, English, and Kazakh
+### **Core API Endpoints**
+- **Authentication**: User registration, login, JWT token management
+- **File Upload & OCR**: Medical document processing with text extraction
+- **Health Analysis**: AI-powered health metric analysis and recommendations
+- **Chat System**: Real-time messaging between patients and doctors
+- **Appointment Management**: Scheduling and management system
+- **Intelligent Agent**: AI agent for critical value detection and recommendations
 
-### 🧠 AI-Powered Health Analysis
-- **Intelligent Agent**: Advanced AI analysis of health metrics
-- **Critical Detection**: Automatic identification of critical health values
-- **Specialist Recommendations**: Smart matching with medical specialists
-- **Localized Explanations**: Medical advice in user's preferred language
-- **Auto-booking**: Automatic appointment scheduling for critical conditions
+### **AI & Machine Learning**
+- **OCR Processing**: Extract text from medical documents (PDF, images)
+- **Health Metric Analysis**: Parse and analyze lab results
+- **Critical Value Detection**: Automatic detection of dangerous health values
+- **Specialist Recommendations**: AI-powered specialist matching
+- **Multilingual Support**: Supports Kazakh, Russian, and English medical texts
 
-### 👩‍⚕️ Doctor Consultations
-- **Specialist Matching**: Find doctors based on health analysis
-- **Appointment Management**: Book, view, and manage appointments
-- **Real-time Chat**: Secure messaging with assigned doctors
-- **Medical History**: Share health data with healthcare providers
-- **Multi-language Support**: Communicate in Russian, English, or Kazakh
+### **Real-time Features**
+- **WebSocket Support**: Real-time chat and notifications
+- **Live Updates**: Instant updates for appointments and messages
+- **Critical Alerts**: Immediate notifications for critical health values
 
-### 📊 Health Monitoring
-- **Health History**: Timeline of all health analyses
-- **Metrics Tracking**: Monitor trends in health indicators
-- **Status Categorization**: Normal, High, Critical health metrics
-- **Export Functionality**: Download health reports
-- **Visual Analytics**: Charts and graphs for health trends
+## 🛠 **Technology Stack**
 
-### 🔐 Security & Privacy
-- **JWT Authentication**: Secure login and registration
-- **Encrypted Communication**: All data transmission encrypted
-- **Biometric Login**: Fingerprint/FaceID support (optional)
-- **Privacy Controls**: Manage data sharing preferences
-- **HIPAA Compliance**: Medical data protection standards
+- **Framework**: FastAPI 0.110.0
+- **Database**: SQLAlchemy 2.0.36 with SQLite/PostgreSQL
+- **Authentication**: JWT with passlib and bcrypt
+- **AI/ML**: Groq API, scikit-learn, pandas, numpy
+- **OCR**: EasyOCR, OpenCV, PyMuPDF, Pillow
+- **Real-time**: WebSockets, asyncio
+- **Deployment**: Uvicorn, Gunicorn
 
-## 🏗️ Architecture
+## 📁 **Project Structure**
 
-### 📁 Project Structure
 ```
-frontend/
-├── src/
-│   ├── components/           # Reusable UI components
-│   │   ├── common/          # Common components (buttons, inputs)
-│   │   ├── charts/          # Health data visualization
-│   │   └── forms/           # Form components
-│   ├── screens/             # Main application screens
-│   │   ├── auth/            # Authentication screens
-│   │   ├── home/            # Dashboard and overview
-│   │   ├── upload/          # Document upload flow
-│   │   ├── history/         # Health analysis history
-│   │   ├── chat/            # Doctor communication
-│   │   ├── appointments/    # Appointment management
-│   │   └── profile/         # User profile management
-│   ├── services/            # API integration services
-│   │   ├── api.ts           # Base API client
-│   │   ├── auth.ts          # Authentication service
-│   │   ├── upload.ts        # File upload service
-│   │   ├── health.ts        # Health data service
-│   │   └── chat.ts          # Chat service
-│   ├── contexts/            # React Context providers
-│   │   ├── AuthContext.tsx  # Authentication state
-│   │   ├── LanguageContext.tsx # Localization
-│   │   └── ThemeContext.tsx # Theme management
-│   ├── navigation/          # Navigation configuration
-│   │   ├── RootNavigator.tsx # Main navigation
-│   │   ├── AuthNavigator.tsx # Auth flow navigation
-│   │   └── TabNavigator.tsx  # Bottom tab navigation
-│   ├── hooks/              # Custom React hooks
-│   │   ├── useAuth.ts      # Authentication hook
-│   │   ├── useApi.ts       # API request hook
-│   │   └── useLanguage.ts  # Localization hook
-│   ├── utils/              # Utility functions
-│   │   ├── validation.ts   # Form validation
-│   │   ├── formatting.ts   # Data formatting
-│   │   └── storage.ts      # Local storage helpers
-│   ├── types/              # TypeScript definitions
-│   │   └── index.ts        # All type definitions
-│   ├── constants/          # App constants
-│   │   ├── theme.ts        # Design system
-│   │   ├── api.ts          # API configuration
-│   │   └── languages.ts    # Language constants
-│   └── localization/       # Internationalization
-│       ├── i18n.ts         # i18n configuration
-│       ├── ru.json         # Russian translations
-│       ├── en.json         # English translations
-│       └── kz.json         # Kazakh translations
-├── assets/                 # Static assets
-│   ├── images/             # App images
-│   ├── icons/              # App icons
-│   └── fonts/              # Custom fonts
-├── android/                # Android-specific code
-├── ios/                    # iOS-specific code
-└── package.json            # Dependencies and scripts
+backend/
+├── app/
+│   ├── __init__.py
+│   ├── main.py                 # FastAPI application entry point
+│   ├── database.py             # Database configuration
+│   ├── models/                 # SQLAlchemy models
+│   │   ├── __init__.py
+│   │   ├── user.py
+│   │   ├── health_analysis.py
+│   │   ├── chat.py
+│   │   └── appointment.py
+│   ├── routers/                # API route handlers
+│   │   ├── __init__.py
+│   │   ├── auth.py             # Authentication endpoints
+│   │   ├── upload.py           # File upload and OCR
+│   │   ├── health.py           # Health analysis endpoints
+│   │   ├── chat.py             # Chat system endpoints
+│   │   ├── appointments.py     # Appointment management
+│   │   └── agent.py            # AI agent endpoints
+│   ├── services/               # Business logic services
+│   │   ├── __init__.py
+│   │   ├── auth_service.py
+│   │   ├── ocr_service.py
+│   │   ├── health_service.py
+│   │   ├── chat_service.py
+│   │   └── agent_service.py
+│   ├── utils/                  # Utility functions
+│   │   ├── __init__.py
+│   │   ├── security.py
+│   │   ├── dependencies.py
+│   │   └── helpers.py
+│   └── websocket.py            # WebSocket handlers
+├── uploads/                    # File upload directory
+├── database.db                 # SQLite database (development)
+├── requirements.txt            # Python dependencies
+├── .env                        # Environment variables
+└── README.md                   # This file
 ```
 
-### 🎨 Design System
-- **Medical Theme**: Clean, professional medical UI
-- **Color Palette**: Medical blues, greens, and status colors
-- **Typography**: Readable fonts optimized for medical content
-- **Icons**: Medical and health-related iconography
-- **Accessibility**: WCAG 2.1 AA compliance
-- **Responsive**: Optimized for all device sizes
+## 🔧 **Installation & Setup**
 
-### 🌐 Localization
-- **Russian (🇷🇺)**: Complete medical terminology in Russian
-- **English (🇺🇸)**: Full English language support
-- **Kazakh (🇰🇿)**: Kazakh language support (planned)
-- **Dynamic Switching**: Change language without app restart
-- **Medical Terms**: Specialized medical vocabulary translation
-- **Date/Number Formatting**: Locale-specific formatting
+### **Prerequisites**
+- Python 3.8+
+- pip (Python package manager)
+- Virtual environment (recommended)
 
-## 🚀 Getting Started
-
-### 📋 Prerequisites
-- **Node.js**: Version 16.0 or higher
-- **React Native CLI**: `npm install -g react-native-cli`
-- **Development Environment**:
-  - For iOS: Xcode 12+ (macOS only)
-  - For Android: Android Studio with SDK 28+
-- **Device/Emulator**: Physical device or emulator for testing
-
-### 🛠️ Installation
-
-1. **Clone and Navigate**
+### **1. Clone Repository**
 ```bash
-cd ai-health-backend/frontend
+git clone https://github.com/Amirchiiik/HealthAiTracker.git -b backend-only
+cd HealthAiTracker
 ```
 
-2. **Install Dependencies**
+### **2. Create Virtual Environment**
 ```bash
-npm install
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. **iOS Setup** (macOS only)
+### **3. Install Dependencies**
 ```bash
-cd ios && pod install && cd ..
+pip install -r requirements.txt
 ```
 
-4. **Configure Environment**
+### **4. Environment Configuration**
+Create a `.env` file in the root directory:
 ```bash
-# Create environment configuration
-cp .env.example .env
+# Database
+DATABASE_URL=sqlite:///./database.db
 
-# Update with your backend API URL
-# Edit .env file with your settings
+# Security
+SECRET_KEY=your-secret-key-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# AI Services
+GROQ_API_KEY=your-groq-api-key
+
+# File Upload
+UPLOAD_DIR=uploads
+MAX_FILE_SIZE=10485760  # 10MB
+
+# CORS
+ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ```
 
-### ▶️ Running the App
-
-#### Development Mode
+### **5. Initialize Database**
 ```bash
-# Start Metro bundler
-npm start
-
-# Run on iOS (macOS only)
-npm run ios
-
-# Run on Android
-npm run android
-
-# Run on specific device
-npm run ios -- --device "iPhone 14"
-npm run android -- --device-id YOUR_DEVICE_ID
+python -c "from app.database import create_tables; create_tables()"
 ```
 
-#### Production Build
+### **6. Run Development Server**
 ```bash
-# Build for Android
-npm run build:android
-
-# Build for iOS (requires Xcode)
-npm run build:ios
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-## 🔧 Configuration
+The API will be available at: `http://localhost:8000`
 
-### 🌐 Backend Integration
-Update the API base URL in `src/constants/api.ts`:
+## 📚 **API Documentation**
 
-```typescript
-export const API_CONFIG = {
-  BASE_URL: 'http://your-backend-url:8001',
-  // ... other configuration
-};
-```
+### **Interactive Documentation**
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
 
-### 🗣️ Language Settings
-Configure supported languages in `src/localization/i18n.ts`:
+### **Key Endpoints**
 
-```typescript
-const resources = {
-  ru: { translation: require('./ru.json') },
-  en: { translation: require('./en.json') },
-  kz: { translation: require('./kz.json') },
-};
-```
+#### **Authentication**
+- `POST /auth/register` - User registration
+- `POST /auth/login` - User login
+- `GET /auth/me` - Get current user info
 
-### 🎨 Theme Customization
-Modify the medical theme in `src/constants/theme.ts`:
+#### **File Upload & Analysis**
+- `POST /upload/file` - Upload medical document
+- `GET /upload/ocr/{filename}` - Get OCR analysis results
+- `POST /upload/text-analysis` - Analyze text directly
 
-```typescript
-export const medicalColors = {
-  primary: '#2E86AB',        // Your primary color
-  secondary: '#28A745',      // Your secondary color
-  // ... other colors
-};
-```
+#### **Health Management**
+- `GET /health/analyses` - Get user's health analyses
+- `GET /health/metrics` - Get health metrics
+- `POST /health/analysis/{id}/summary` - Generate analysis summary
 
-## 📱 Core Features Guide
+#### **Chat System**
+- `GET /chat/conversations` - Get user conversations
+- `GET /chat/history/{user_id}` - Get chat history
+- `POST /chat/send` - Send message
+- `PUT /chat/read/{message_id}` - Mark message as read
 
-### 🔐 Authentication Flow
-1. **Login/Register**: Email and password authentication
-2. **JWT Token Management**: Automatic token refresh and storage
-3. **Biometric Authentication**: Optional fingerprint/FaceID
-4. **Session Management**: Secure logout and session expiry
+#### **Appointments**
+- `GET /appointments` - Get appointments
+- `POST /appointments` - Create appointment
+- `PUT /appointments/{id}` - Update appointment
+- `DELETE /appointments/{id}` - Cancel appointment
 
-### 📤 Document Upload Process
-1. **Capture/Select**: Camera or gallery document selection
-2. **Upload Progress**: Real-time upload progress indicator
-3. **OCR Processing**: Automatic text extraction from images/PDFs
-4. **Results Display**: Parsed health metrics with explanations
+#### **AI Agent**
+- `POST /agent/analyze-and-act` - Trigger AI agent analysis
+- `GET /agent/notifications` - Get agent notifications
+- `GET /agent/thresholds` - Get critical value thresholds
 
-### 🧠 AI Analysis Workflow
-1. **Trigger Analysis**: Process uploaded health documents
-2. **Metric Extraction**: Identify health indicators and values
-3. **Risk Assessment**: Categorize metrics (normal/high/critical)
-4. **Specialist Matching**: Recommend appropriate doctors
-5. **Auto-booking**: Schedule critical appointments automatically
+#### **WebSocket**
+- `WS /ws/{user_id}` - WebSocket connection for real-time updates
 
-### 💬 Doctor Communication
-1. **Chat Interface**: Real-time messaging with doctors
-2. **File Sharing**: Share medical documents and images
-3. **Appointment Integration**: Link chats to specific appointments
-4. **Multi-language**: Communicate in preferred language
+## 🔒 **Security Features**
 
-## 🧪 Testing
+- **JWT Authentication**: Secure token-based authentication
+- **Password Hashing**: bcrypt for secure password storage
+- **CORS Protection**: Configurable cross-origin resource sharing
+- **Input Validation**: Pydantic models for request validation
+- **File Upload Security**: File type and size validation
+- **SQL Injection Protection**: SQLAlchemy ORM prevents SQL injection
 
-### Unit Tests
+## 🧪 **Testing**
+
+### **Run Tests**
 ```bash
-npm test
+pytest
 ```
 
-### E2E Tests
+### **Run with Coverage**
 ```bash
-# iOS
-npm run test:e2e:ios
-
-# Android
-npm run test:e2e:android
+pytest --cov=app tests/
 ```
 
-### Linting
+### **Test Categories**
+- **Unit Tests**: Individual function testing
+- **Integration Tests**: API endpoint testing
+- **WebSocket Tests**: Real-time functionality testing
+
+## 🚀 **Deployment**
+
+### **Production Server**
 ```bash
-npm run lint
+gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 ```
 
-## 📦 Build & Deployment
+### **Docker Deployment**
+```dockerfile
+FROM python:3.9-slim
 
-### Android APK
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+### **Environment Variables for Production**
 ```bash
-cd android
-./gradlew assembleRelease
+DATABASE_URL=postgresql://user:password@localhost/healthtracker
+SECRET_KEY=production-secret-key
+GROQ_API_KEY=production-groq-key
+ALLOWED_ORIGINS=https://yourdomain.com
 ```
 
-### iOS IPA
+## 📊 **Performance & Monitoring**
+
+### **Health Check**
+- `GET /health` - API health status
+
+### **Metrics**
+- Request/response times
+- Database query performance
+- File upload success rates
+- AI analysis accuracy
+
+## 🔧 **Development**
+
+### **Code Style**
+- **Formatter**: Black
+- **Linter**: Flake8
+- **Type Checking**: mypy
+
+### **Pre-commit Hooks**
 ```bash
-cd ios
-xcodebuild -workspace AIHealthTrackerMobile.xcworkspace \
-  -scheme AIHealthTrackerMobile \
-  -configuration Release \
-  -archivePath build/AIHealthTrackerMobile.xcarchive \
-  archive
+pip install pre-commit
+pre-commit install
 ```
 
-### App Store/Play Store
-- Follow platform-specific guidelines for app submission
-- Ensure compliance with medical app regulations
-- Include privacy policy and terms of service
+## 📞 **Support**
 
-## 🛡️ Security Considerations
+### **Common Issues**
+1. **Database Connection**: Check DATABASE_URL in .env
+2. **File Upload Errors**: Verify UPLOAD_DIR permissions
+3. **AI Analysis Failures**: Check GROQ_API_KEY configuration
+4. **WebSocket Issues**: Ensure proper CORS configuration
 
-### Data Protection
-- **Encryption**: All sensitive data encrypted at rest and in transit
-- **Token Security**: JWT tokens stored securely with encryption
-- **API Security**: All requests authenticated and authorized
-- **Medical Privacy**: HIPAA-compliant data handling
+### **Logs**
+Application logs are available in the console output. For production, configure proper logging:
 
-### Best Practices
-- Regular security audits and updates
-- Secure coding practices implementation
-- Input validation and sanitization
-- Error handling without data exposure
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+```
 
-## 🤝 Contributing
+## 🤝 **Contributing**
 
-### Development Workflow
-1. **Branch**: Create feature branch from main
-2. **Develop**: Implement feature with tests
-3. **Test**: Run all tests and linting
-4. **Review**: Submit pull request for review
-5. **Deploy**: Merge after approval
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
-### Code Standards
-- **TypeScript**: Strict typing for all components
-- **ESLint**: Code linting with medical app rules
-- **Prettier**: Consistent code formatting
-- **Testing**: Unit tests for all business logic
+## 📄 **License**
 
-## 📞 Support
-
-### Documentation
-- **API Documentation**: Backend API endpoint documentation
-- **Component Library**: Storybook documentation (planned)
-- **User Guide**: End-user application guide
-
-### Getting Help
-- **Issues**: GitHub issues for bug reports
-- **Discussions**: GitHub discussions for questions
-- **Email**: Technical support email contact
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Medical Professionals**: For guidance on medical workflows
-- **React Native Community**: For excellent tooling and support
-- **Open Source Contributors**: For the libraries that make this possible
+This project is licensed under the MIT License.
 
 ---
 
-**🏥 AI Health Tracker Mobile - Empowering patients with intelligent health monitoring and medical consultations** 
+## 🎯 **API Status: Production Ready**
 
-Built with ❤️ using React Native, TypeScript, and modern mobile development practices. 
+✅ **Authentication System**: Complete with JWT  
+✅ **File Upload & OCR**: Multi-format support  
+✅ **Health Analysis**: AI-powered insights  
+✅ **Chat System**: Real-time messaging  
+✅ **Appointment Management**: Full CRUD operations  
+✅ **AI Agent**: Critical value detection  
+✅ **WebSocket Support**: Real-time updates  
+✅ **Security**: Production-grade security measures  
+✅ **Documentation**: Comprehensive API docs  
+✅ **Testing**: Unit and integration tests  
+
+**Ready for production deployment!**
+
+*Last updated: January 25, 2025* 
