@@ -1,345 +1,381 @@
-# AI Health Tracker Mobile App 📱
+# 🏥 AI Health Tracker - Frontend Application
 
-A comprehensive React Native mobile application for the AI Health Tracker system, providing patients with medical document upload, AI-powered analysis, doctor consultations, and health monitoring capabilities.
+## 📋 **Overview**
 
-![React Native](https://img.shields.io/badge/React%20Native-0.73.0-blue)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.1.6-blue)
-![Languages](https://img.shields.io/badge/Languages-🇷🇺%20🇺🇸%20🇰🇿-green)
+This is the React frontend application for the AI Health Tracker system, providing a comprehensive web interface for patients and doctors to manage health data, upload medical documents, and access AI-powered health analysis.
 
-## 🎯 Features
+## 🚀 **Features**
 
-### 📤 Document Upload & OCR
-- **Camera Capture**: Take photos of medical documents
-- **Gallery Selection**: Choose existing photos from device
-- **PDF Support**: Upload PDF medical reports
-- **OCR Processing**: Automatic text extraction with explanations
-- **Multi-language Support**: Process documents in Russian, English, and Kazakh
+### **Patient Features**
+- **Document Upload**: Upload medical documents with drag-and-drop interface
+- **OCR Analysis**: Automatic text extraction from medical documents
+- **Health Dashboard**: View health metrics and analysis results
+- **AI Agent**: Access intelligent health recommendations
+- **Appointment Booking**: Schedule appointments with doctors
+- **Real-time Chat**: Communicate with healthcare providers
+- **Health History**: Track health metrics over time
 
-### 🧠 AI-Powered Health Analysis
-- **Intelligent Agent**: Advanced AI analysis of health metrics
-- **Critical Detection**: Automatic identification of critical health values
-- **Specialist Recommendations**: Smart matching with medical specialists
-- **Localized Explanations**: Medical advice in user's preferred language
-- **Auto-booking**: Automatic appointment scheduling for critical conditions
+### **Doctor Features**
+- **Patient Management**: View and manage patient cases
+- **AI Agent Dashboard**: Access comprehensive AI analysis tools
+- **Appointment Management**: Manage doctor schedules and appointments
+- **Analytics Dashboard**: View patient statistics and trends
+- **Real-time Chat**: Communicate with patients
+- **Critical Alerts**: Receive notifications for critical patient values
 
-### 👩‍⚕️ Doctor Consultations
-- **Specialist Matching**: Find doctors based on health analysis
-- **Appointment Management**: Book, view, and manage appointments
-- **Real-time Chat**: Secure messaging with assigned doctors
-- **Medical History**: Share health data with healthcare providers
-- **Multi-language Support**: Communicate in Russian, English, or Kazakh
+### **AI-Powered Features**
+- **Critical Value Detection**: Automatic detection of dangerous health values
+- **Emergency Alerts**: Full-screen alerts for critical conditions
+- **Specialist Recommendations**: AI-powered specialist matching
+- **Automatic Appointment Booking**: Emergency appointment scheduling
+- **Health Insights**: Detailed explanations for each health metric
 
-### 📊 Health Monitoring
-- **Health History**: Timeline of all health analyses
-- **Metrics Tracking**: Monitor trends in health indicators
-- **Status Categorization**: Normal, High, Critical health metrics
-- **Export Functionality**: Download health reports
-- **Visual Analytics**: Charts and graphs for health trends
+## 🛠 **Technology Stack**
 
-### 🔐 Security & Privacy
-- **JWT Authentication**: Secure login and registration
-- **Encrypted Communication**: All data transmission encrypted
-- **Biometric Login**: Fingerprint/FaceID support (optional)
-- **Privacy Controls**: Manage data sharing preferences
-- **HIPAA Compliance**: Medical data protection standards
+- **Framework**: React 18.2.0 with TypeScript
+- **Styling**: Tailwind CSS 3.3.0
+- **State Management**: React Query (TanStack Query)
+- **Routing**: React Router 6.8.1
+- **Icons**: Lucide React
+- **HTTP Client**: Axios
+- **WebSockets**: Native WebSocket API
+- **Build Tool**: Create React App
+- **Testing**: Jest & React Testing Library
 
-## 🏗️ Architecture
+## 📁 **Project Structure**
 
-### 📁 Project Structure
 ```
 frontend/
+├── public/                     # Static assets
+│   ├── index.html
+│   ├── favicon.ico
+│   └── manifest.json
 ├── src/
-│   ├── components/           # Reusable UI components
-│   │   ├── common/          # Common components (buttons, inputs)
-│   │   ├── charts/          # Health data visualization
-│   │   └── forms/           # Form components
-│   ├── screens/             # Main application screens
-│   │   ├── auth/            # Authentication screens
-│   │   ├── home/            # Dashboard and overview
-│   │   ├── upload/          # Document upload flow
-│   │   ├── history/         # Health analysis history
-│   │   ├── chat/            # Doctor communication
-│   │   ├── appointments/    # Appointment management
-│   │   └── profile/         # User profile management
-│   ├── services/            # API integration services
-│   │   ├── api.ts           # Base API client
-│   │   ├── auth.ts          # Authentication service
-│   │   ├── upload.ts        # File upload service
-│   │   ├── health.ts        # Health data service
-│   │   └── chat.ts          # Chat service
-│   ├── contexts/            # React Context providers
-│   │   ├── AuthContext.tsx  # Authentication state
-│   │   ├── LanguageContext.tsx # Localization
-│   │   └── ThemeContext.tsx # Theme management
-│   ├── navigation/          # Navigation configuration
-│   │   ├── RootNavigator.tsx # Main navigation
-│   │   ├── AuthNavigator.tsx # Auth flow navigation
-│   │   └── TabNavigator.tsx  # Bottom tab navigation
-│   ├── hooks/              # Custom React hooks
-│   │   ├── useAuth.ts      # Authentication hook
-│   │   ├── useApi.ts       # API request hook
-│   │   └── useLanguage.ts  # Localization hook
-│   ├── utils/              # Utility functions
-│   │   ├── validation.ts   # Form validation
-│   │   ├── formatting.ts   # Data formatting
-│   │   └── storage.ts      # Local storage helpers
-│   ├── types/              # TypeScript definitions
-│   │   └── index.ts        # All type definitions
-│   ├── constants/          # App constants
-│   │   ├── theme.ts        # Design system
-│   │   ├── api.ts          # API configuration
-│   │   └── languages.ts    # Language constants
-│   └── localization/       # Internationalization
-│       ├── i18n.ts         # i18n configuration
-│       ├── ru.json         # Russian translations
-│       ├── en.json         # English translations
-│       └── kz.json         # Kazakh translations
-├── assets/                 # Static assets
-│   ├── images/             # App images
-│   ├── icons/              # App icons
-│   └── fonts/              # Custom fonts
-├── android/                # Android-specific code
-├── ios/                    # iOS-specific code
-└── package.json            # Dependencies and scripts
+│   ├── components/             # Reusable UI components
+│   │   ├── alerts/            # Alert components
+│   │   ├── analysis/          # Analysis components
+│   │   ├── common/            # Common UI components
+│   │   ├── layout/            # Layout components
+│   │   └── upload/            # File upload components
+│   ├── pages/                 # Main application pages
+│   │   ├── agent/             # AI Agent pages
+│   │   ├── appointments/      # Appointment management
+│   │   ├── auth/              # Authentication pages
+│   │   ├── chat/              # Chat interface
+│   │   ├── doctor/            # Doctor dashboard pages
+│   │   ├── history/           # Health history pages
+│   │   ├── patient/           # Patient dashboard pages
+│   │   └── settings/          # Settings pages
+│   ├── services/              # API integration services
+│   │   ├── agentService.ts    # AI Agent API calls
+│   │   ├── authService.ts     # Authentication service
+│   │   ├── chatService.ts     # Chat functionality
+│   │   ├── criticalAnalysisService.ts # Critical analysis
+│   │   ├── healthService.ts   # Health data service
+│   │   └── uploadService.ts   # File upload service
+│   ├── contexts/              # React Context providers
+│   │   └── AuthContext.tsx    # Authentication state
+│   ├── hooks/                 # Custom React hooks
+│   │   └── useWebSocket.ts    # WebSocket hook
+│   ├── types/                 # TypeScript definitions
+│   │   └── index.ts           # All type definitions
+│   ├── config/                # Configuration files
+│   │   └── api.ts             # API configuration
+│   ├── App.tsx                # Main App component
+│   ├── index.tsx              # Application entry point
+│   └── index.css              # Global styles
+├── package.json               # Dependencies and scripts
+├── tailwind.config.js         # Tailwind CSS configuration
+├── tsconfig.json              # TypeScript configuration
+└── README.md                  # This file
 ```
 
-### 🎨 Design System
-- **Medical Theme**: Clean, professional medical UI
-- **Color Palette**: Medical blues, greens, and status colors
-- **Typography**: Readable fonts optimized for medical content
-- **Icons**: Medical and health-related iconography
-- **Accessibility**: WCAG 2.1 AA compliance
-- **Responsive**: Optimized for all device sizes
+## 🔧 **Installation & Setup**
 
-### 🌐 Localization
-- **Russian (🇷🇺)**: Complete medical terminology in Russian
-- **English (🇺🇸)**: Full English language support
-- **Kazakh (🇰🇿)**: Kazakh language support (planned)
-- **Dynamic Switching**: Change language without app restart
-- **Medical Terms**: Specialized medical vocabulary translation
-- **Date/Number Formatting**: Locale-specific formatting
-
-## 🚀 Getting Started
-
-### 📋 Prerequisites
+### **Prerequisites**
 - **Node.js**: Version 16.0 or higher
-- **React Native CLI**: `npm install -g react-native-cli`
-- **Development Environment**:
-  - For iOS: Xcode 12+ (macOS only)
-  - For Android: Android Studio with SDK 28+
-- **Device/Emulator**: Physical device or emulator for testing
+- **npm**: Version 7.0 or higher
+- **Backend API**: AI Health Tracker backend running on port 8000
 
-### 🛠️ Installation
-
-1. **Clone and Navigate**
+### **1. Clone Repository**
 ```bash
-cd ai-health-backend/frontend
+git clone https://github.com/Amirchiiik/HealthAiTracker.git -b frontend-only
+cd HealthAiTracker/frontend
 ```
 
-2. **Install Dependencies**
+### **2. Install Dependencies**
 ```bash
 npm install
 ```
 
-3. **iOS Setup** (macOS only)
+### **3. Environment Configuration**
+Create a `.env` file in the frontend directory:
 ```bash
-cd ios && pod install && cd ..
+# API Configuration
+REACT_APP_API_URL=http://localhost:8000
+REACT_APP_WS_URL=ws://localhost:8000
+
+# App Configuration
+REACT_APP_NAME=AI Health Tracker
+REACT_APP_VERSION=1.0.0
+
+# Feature Flags
+REACT_APP_ENABLE_DEMO_MODE=true
+REACT_APP_ENABLE_CRITICAL_ALERTS=true
 ```
 
-4. **Configure Environment**
+### **4. Start Development Server**
 ```bash
-# Create environment configuration
-cp .env.example .env
-
-# Update with your backend API URL
-# Edit .env file with your settings
-```
-
-### ▶️ Running the App
-
-#### Development Mode
-```bash
-# Start Metro bundler
 npm start
-
-# Run on iOS (macOS only)
-npm run ios
-
-# Run on Android
-npm run android
-
-# Run on specific device
-npm run ios -- --device "iPhone 14"
-npm run android -- --device-id YOUR_DEVICE_ID
 ```
 
-#### Production Build
-```bash
-# Build for Android
-npm run build:android
+The application will be available at: `http://localhost:3000`
 
-# Build for iOS (requires Xcode)
-npm run build:ios
-```
+## 🎨 **Design System**
 
-## 🔧 Configuration
+### **Color Palette**
+- **Primary**: Blue (#3B82F6) - Medical trust and reliability
+- **Secondary**: Green (#10B981) - Health and wellness
+- **Success**: Green (#22C55E) - Positive health indicators
+- **Warning**: Orange (#F59E0B) - Attention needed
+- **Error**: Red (#EF4444) - Critical health values
+- **Critical**: Dark Red (#DC2626) - Emergency situations
 
-### 🌐 Backend Integration
-Update the API base URL in `src/constants/api.ts`:
+### **Typography**
+- **Headings**: Inter font family for clarity
+- **Body**: System fonts for readability
+- **Medical Data**: Monospace for precise values
 
-```typescript
-export const API_CONFIG = {
-  BASE_URL: 'http://your-backend-url:8001',
-  // ... other configuration
-};
-```
+### **Components**
+- **Cards**: Clean, shadowed containers for content
+- **Buttons**: Consistent styling with hover states
+- **Forms**: Accessible form inputs with validation
+- **Modals**: Full-screen alerts for critical information
+- **Navigation**: Responsive navigation with role-based menus
 
-### 🗣️ Language Settings
-Configure supported languages in `src/localization/i18n.ts`:
+## 🔐 **Authentication & Security**
 
-```typescript
-const resources = {
-  ru: { translation: require('./ru.json') },
-  en: { translation: require('./en.json') },
-  kz: { translation: require('./kz.json') },
-};
-```
-
-### 🎨 Theme Customization
-Modify the medical theme in `src/constants/theme.ts`:
-
-```typescript
-export const medicalColors = {
-  primary: '#2E86AB',        // Your primary color
-  secondary: '#28A745',      // Your secondary color
-  // ... other colors
-};
-```
-
-## 📱 Core Features Guide
-
-### 🔐 Authentication Flow
+### **Authentication Flow**
 1. **Login/Register**: Email and password authentication
-2. **JWT Token Management**: Automatic token refresh and storage
-3. **Biometric Authentication**: Optional fingerprint/FaceID
-4. **Session Management**: Secure logout and session expiry
+2. **JWT Tokens**: Secure token-based authentication
+3. **Role-Based Access**: Patient and doctor role management
+4. **Session Management**: Automatic token refresh and logout
 
-### 📤 Document Upload Process
-1. **Capture/Select**: Camera or gallery document selection
-2. **Upload Progress**: Real-time upload progress indicator
-3. **OCR Processing**: Automatic text extraction from images/PDFs
-4. **Results Display**: Parsed health metrics with explanations
+### **Security Features**
+- **Protected Routes**: Authentication required for sensitive pages
+- **CORS Protection**: Configured for backend API communication
+- **Input Validation**: Client-side validation for all forms
+- **XSS Protection**: Sanitized user inputs and outputs
 
-### 🧠 AI Analysis Workflow
-1. **Trigger Analysis**: Process uploaded health documents
-2. **Metric Extraction**: Identify health indicators and values
-3. **Risk Assessment**: Categorize metrics (normal/high/critical)
-4. **Specialist Matching**: Recommend appropriate doctors
-5. **Auto-booking**: Schedule critical appointments automatically
+## 🚨 **Critical Analysis Integration**
 
-### 💬 Doctor Communication
-1. **Chat Interface**: Real-time messaging with doctors
-2. **File Sharing**: Share medical documents and images
-3. **Appointment Integration**: Link chats to specific appointments
-4. **Multi-language**: Communicate in preferred language
+### **Automatic Detection**
+- **Upload Monitoring**: Checks for critical values after file upload
+- **Real-time Analysis**: Immediate processing of health metrics
+- **Threshold-Based**: Uses medical thresholds for detection
+- **Multi-metric Support**: Analyzes various health indicators
 
-## 🧪 Testing
+### **Emergency Alerts**
+- **Full-screen Modals**: Unmissable critical value notifications
+- **Urgency Levels**: Color-coded priority indicators (low/medium/high/critical)
+- **Action Plans**: Step-by-step recommended actions
+- **Emergency Contacts**: Quick access to emergency information
 
-### Unit Tests
+### **AI Agent Integration**
+- **Automatic Triggering**: Critical values trigger AI analysis
+- **Specialist Recommendations**: AI suggests appropriate doctors
+- **Appointment Booking**: Automatic emergency appointment scheduling
+- **Comprehensive Reports**: Detailed analysis and next steps
+
+## 💬 **Real-time Features**
+
+### **WebSocket Integration**
+- **Live Chat**: Real-time messaging between patients and doctors
+- **Notifications**: Instant alerts for appointments and messages
+- **Connection Management**: Automatic reconnection and error handling
+- **Message Scoping**: Proper message routing to intended recipients
+
+### **Chat System**
+- **Conversation Management**: Organized chat threads
+- **Message History**: Persistent chat history
+- **Read Receipts**: Message read status tracking
+- **File Sharing**: Share medical documents in chat
+
+## 📱 **Responsive Design**
+
+### **Mobile Optimization**
+- **Touch-friendly**: Large buttons and touch targets
+- **Responsive Layout**: Adapts to all screen sizes
+- **Mobile Navigation**: Collapsible navigation menu
+- **Swipe Gestures**: Intuitive mobile interactions
+
+### **Desktop Experience**
+- **Multi-column Layout**: Efficient use of screen space
+- **Keyboard Navigation**: Full keyboard accessibility
+- **Hover States**: Interactive feedback for desktop users
+- **Context Menus**: Right-click functionality where appropriate
+
+## 🧪 **Testing**
+
+### **Run Tests**
 ```bash
+# Unit tests
 npm test
+
+# Test coverage
+npm run test:coverage
+
+# E2E tests (if configured)
+npm run test:e2e
 ```
 
-### E2E Tests
+### **Linting & Formatting**
 ```bash
-# iOS
-npm run test:e2e:ios
-
-# Android
-npm run test:e2e:android
-```
-
-### Linting
-```bash
+# ESLint
 npm run lint
+
+# Fix linting issues
+npm run lint:fix
+
+# Prettier formatting
+npm run format
 ```
 
-## 📦 Build & Deployment
+## 🚀 **Build & Deployment**
 
-### Android APK
+### **Production Build**
 ```bash
-cd android
-./gradlew assembleRelease
+npm run build
 ```
 
-### iOS IPA
+### **Deployment Options**
+
+#### **Static Hosting (Netlify, Vercel)**
 ```bash
-cd ios
-xcodebuild -workspace AIHealthTrackerMobile.xcworkspace \
-  -scheme AIHealthTrackerMobile \
-  -configuration Release \
-  -archivePath build/AIHealthTrackerMobile.xcarchive \
-  archive
+# Build the app
+npm run build
+
+# Deploy the build folder
+# Follow platform-specific deployment guides
 ```
 
-### App Store/Play Store
-- Follow platform-specific guidelines for app submission
-- Ensure compliance with medical app regulations
-- Include privacy policy and terms of service
+#### **Docker Deployment**
+```dockerfile
+FROM node:16-alpine as build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
 
-## 🛡️ Security Considerations
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
 
-### Data Protection
-- **Encryption**: All sensitive data encrypted at rest and in transit
-- **Token Security**: JWT tokens stored securely with encryption
-- **API Security**: All requests authenticated and authorized
-- **Medical Privacy**: HIPAA-compliant data handling
+#### **Environment Variables for Production**
+```bash
+REACT_APP_API_URL=https://your-backend-api.com
+REACT_APP_WS_URL=wss://your-backend-api.com
+REACT_APP_ENABLE_DEMO_MODE=false
+```
 
-### Best Practices
-- Regular security audits and updates
-- Secure coding practices implementation
-- Input validation and sanitization
-- Error handling without data exposure
+## 📊 **Performance Optimization**
 
-## 🤝 Contributing
+### **Code Splitting**
+- **Lazy Loading**: Route-based code splitting
+- **Component Splitting**: Large components split into chunks
+- **Bundle Analysis**: Regular bundle size monitoring
 
-### Development Workflow
-1. **Branch**: Create feature branch from main
-2. **Develop**: Implement feature with tests
-3. **Test**: Run all tests and linting
-4. **Review**: Submit pull request for review
-5. **Deploy**: Merge after approval
+### **Caching Strategy**
+- **React Query**: Intelligent data caching and synchronization
+- **Service Worker**: Static asset caching (if configured)
+- **Browser Caching**: Optimized cache headers
 
-### Code Standards
+### **Performance Monitoring**
+- **Web Vitals**: Core web vitals tracking
+- **Bundle Size**: Monitor and optimize bundle size
+- **Load Times**: Track page load performance
+
+## 🔧 **Development**
+
+### **Code Standards**
 - **TypeScript**: Strict typing for all components
-- **ESLint**: Code linting with medical app rules
+- **ESLint**: Code linting with React best practices
 - **Prettier**: Consistent code formatting
-- **Testing**: Unit tests for all business logic
+- **Husky**: Pre-commit hooks for quality assurance
 
-## 📞 Support
+### **Component Development**
+- **Functional Components**: React hooks-based components
+- **Custom Hooks**: Reusable logic extraction
+- **Context API**: State management for global data
+- **Error Boundaries**: Graceful error handling
 
-### Documentation
-- **API Documentation**: Backend API endpoint documentation
-- **Component Library**: Storybook documentation (planned)
-- **User Guide**: End-user application guide
+## 📚 **API Integration**
 
-### Getting Help
-- **Issues**: GitHub issues for bug reports
-- **Discussions**: GitHub discussions for questions
-- **Email**: Technical support email contact
+### **Service Layer**
+- **Axios Client**: Configured HTTP client with interceptors
+- **Error Handling**: Centralized error handling and user feedback
+- **Request/Response Transformation**: Data formatting and validation
+- **Authentication**: Automatic token attachment and refresh
 
-## 📄 License
+### **Key Endpoints**
+- **Authentication**: `/auth/login`, `/auth/register`
+- **File Upload**: `/upload/file`, `/upload/ocr/{filename}`
+- **Health Data**: `/health/analyses`, `/health/metrics`
+- **Chat**: `/chat/conversations`, `/chat/send`
+- **Appointments**: `/appointments` (CRUD operations)
+- **AI Agent**: `/agent/analyze-and-act`, `/agent/notifications`
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 🤝 **Contributing**
 
-## 🙏 Acknowledgments
+### **Development Workflow**
+1. **Fork**: Fork the repository
+2. **Branch**: Create feature branch from main
+3. **Develop**: Implement feature with tests
+4. **Test**: Run all tests and linting
+5. **Review**: Submit pull request for review
 
-- **Medical Professionals**: For guidance on medical workflows
-- **React Native Community**: For excellent tooling and support
-- **Open Source Contributors**: For the libraries that make this possible
+### **Code Review Guidelines**
+- **TypeScript**: Ensure proper typing
+- **Testing**: Include unit tests for new features
+- **Documentation**: Update documentation for new features
+- **Performance**: Consider performance implications
+
+## 📞 **Support**
+
+### **Common Issues**
+1. **API Connection**: Check backend server is running on port 8000
+2. **WebSocket Errors**: Verify WebSocket URL configuration
+3. **Build Errors**: Clear node_modules and reinstall dependencies
+4. **Authentication Issues**: Check JWT token configuration
+
+### **Debugging**
+- **Browser DevTools**: Use React Developer Tools
+- **Console Logs**: Check browser console for errors
+- **Network Tab**: Monitor API requests and responses
+- **React Query DevTools**: Debug data fetching and caching
+
+## 📄 **License**
+
+This project is licensed under the MIT License.
 
 ---
 
-**🏥 AI Health Tracker Mobile - Empowering patients with intelligent health monitoring and medical consultations** 
+## 🎯 **Frontend Status: Production Ready**
 
-Built with ❤️ using React Native, TypeScript, and modern mobile development practices. 
+✅ **Authentication System**: Complete with JWT and role-based access  
+✅ **File Upload & OCR**: Drag-and-drop with progress indicators  
+✅ **Health Dashboard**: Comprehensive patient and doctor dashboards  
+✅ **AI Agent Integration**: Full AI analysis and recommendations  
+✅ **Critical Alerts**: Emergency notification system  
+✅ **Real-time Chat**: WebSocket-based messaging  
+✅ **Appointment System**: Complete booking and management  
+✅ **Responsive Design**: Mobile and desktop optimized  
+✅ **TypeScript**: Fully typed codebase  
+✅ **Testing**: Unit tests and linting configured  
+
+**Ready for production deployment!**
+
+*Last updated: January 25, 2025* 
